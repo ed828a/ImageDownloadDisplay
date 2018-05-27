@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Downloading Image</string>
+    <string name="picasso">Picasso</string>
+    <string name="glide">Glide</string>
+    <string name="httpurl">HttpUrl</string>
+    <string name="okhttp">OkHttp</string>
+    <string name="volley">Volley</string>
+    <string name="photo">Photo</string>
+</resources>
