@@ -12,6 +12,7 @@ import android.widget.Toast
 import com.android.volley.Response
 import com.android.volley.toolbox.ImageRequest
 import com.android.volley.toolbox.Volley
+import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.BitmapImageViewTarget
 import com.bumptech.glide.request.transition.Transition
 import com.squareup.picasso.Picasso
@@ -36,12 +37,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     override fun onClick(v: View?) {
         startChronometer()
         imageView.setImageResource(android.R.color.transparent)
-        when(v?.id){
+        when (v?.id) {
             R.id.buttonPicasso -> loadImageUsingPicasso()
-            R.id.buttonGlide ->  loadImageUsingGlide()
+            R.id.buttonGlide -> loadImageUsingGlide()
             R.id.buttonVolley -> loadImageUsingVolley()
             R.id.buttonOkHttp -> loadImageUsingOkHttp()
-            R.id.buttonHttp ->downloadBackground()
+            R.id.buttonHttp -> downloadBackground()
         }
     }
 
@@ -85,7 +86,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         try {
             val inputStream = BufferedInputStream(urlConnection.inputStream)
             bitmap = BitmapFactory.decodeStream(inputStream)
-        } catch (e: IOException){
+        } catch (e: IOException) {
             e.printStackTrace()
         } finally {
             urlConnection.disconnect()
@@ -93,14 +94,15 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         return bitmap
     }
 
-    private fun downloadBackground(){
+    private fun downloadBackground() {
         val weakRef: Ref<MainActivity> = this.asReference()
-        async(UI){
-            val data : Deferred<Bitmap?> = bg{  // background thread
+        async(UI) {
+            val data: Deferred<Bitmap?> = bg {
+                // background thread
                 loadImageUsingHttpUrlConnection()
             }
             val bitmap = data.await()
-            if (bitmap != null){
+            if (bitmap != null) {
                 weakRef().imageView.setImageBitmap(bitmap)
                 weakRef().chronometer.stop()
             }
@@ -108,13 +110,13 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     }
 
 
-    private fun loadImageUsingOkHttp(){
+    private fun loadImageUsingOkHttp() {
         okClient.newCall(okRequest)
                 // enqueue make sure the downloading happens in background
-                .enqueue(object : Callback{
+                .enqueue(object : Callback {
                     override fun onFailure(call: Call?, e: IOException?) {
                         e?.printStackTrace()
-                     }
+                    }
 
                     override fun onResponse(call: Call?, response: okhttp3.Response?) {
                         val inputStream = response?.body()?.byteStream()
@@ -129,7 +131,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                     }
                 })
     }
-    private fun loadImageUsingVolley(){
+
+    private fun loadImageUsingVolley() {
         val imageRequest = ImageRequest(ImageUrl,
                 Response.Listener { response ->
                     imageView.setImageBitmap(response)
@@ -147,12 +150,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     }
 
-    private fun loadImageUsingGlide(){
-        GlideApp.with(this)
+    private fun loadImageUsingGlide() {
+        Glide.with(this)
                 .asBitmap()
                 .load(Uri.parse(ImageUrl))
 //                .into(imageView)
-                .into(object : BitmapImageViewTarget(imageView){
+                .into(object : BitmapImageViewTarget(imageView) {
                     override fun onResourceReady(resource: Bitmap?, transition: Transition<in Bitmap>?) {
                         super.onResourceReady(resource, transition)
                         chronometer.stop()
